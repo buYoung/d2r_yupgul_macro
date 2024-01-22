@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>보석함 조합 매크로</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 h-screen flex items-center justify-center">
+<div class="bg-white p-8 rounded-lg shadow-md w-full max-w-lg">
+    <h1 class="text-2xl font-bold mb-4">보석함 조합 매크로</h1>
+
+    <!-- 보석 선택 드롭다운 -->
+    <div class="mb-4">
+        <label for="gemSelect" class="block text-gray-700 text-sm font-bold mb-2">보석 선택:</label>
+        <select id="gemSelect" class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500" multiple>
+            <option value="low">최하급 보석</option>
+            <option value="normal">하급 보석</option>
+            <option value="high">보통 보석</option>
+            <option value="higher">상급 보석</option>
+            <option value="top">최상급 보석</option>
+        </select>
+    </div>
+
+    <!-- 핫키 설정 입력란 -->
+    <div class="mb-4">
+        <label for="hotkey" class="block text-gray-700 text-sm font-bold mb-2">핫키 설정:</label>
+        <input type="text" id="hotkey" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+    </div>
+
+    <!-- 실행 버튼 -->
+    <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full">매크로 실행</button>
+
+    <!-- 도움말 및 지침 -->
+    <div class="mt-4">
+        <p class="text-sm text-gray-600">사용 방법에 대한 도움이 필요하면 <a href="#" class="text-blue-500">여기를 클릭하세요.</a></p>
+    </div>
+</div>
+</body>
+</html>
