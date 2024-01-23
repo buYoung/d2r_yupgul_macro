@@ -1,6 +1,9 @@
 from ctypes import windll
 from ctypes import byref as ctypes_byref
 from ctypes.wintypes import MSG as wintypes_MSG
+from ctypes import windll, byref
+from ctypes.wintypes import MSG
+import threading
 import win32con
 
 
@@ -12,59 +15,70 @@ class GlobalHotKeys(object):
     MOD_CONTROL = win32con.MOD_CONTROL
     MOD_SHIFT = win32con.MOD_SHIFT
     MOD_WIN = win32con.MOD_WIN
+    index = 0
+
+    listen_thread = None
+    listenning = False
 
     @classmethod
     def register(cls, vk, keyname, modifier=0, func=None):
-
-        indexof = [i for i, s in enumerate(cls.key_mapping) if vk in s]
-        if indexof != []:
-            del cls.key_mapping[indexof[0]]
-
-        # Called as a decorator?
-        if func is None:
-            def register_decorator(f):
-                cls.register(vk, keyname, modifier, f)
-                return f
-
-            return register_decorator
-        else:
-            cls.key_mapping.append((vk, keyname, modifier, func))
+        cls.key_mapping = [(vk_item, keyname_item, mod_item, func_item, index_item) for
+                           vk_item, keyname_item, mod_item, func_item, index_item
+                           in cls.key_mapping if vk_item != vk]
+        cls.index += 1
+        cls.key_mapping.append((vk, keyname, modifier, func, cls.index))
 
     @classmethod
-    def unregister(cls, vk):  # use vk number to delete from key_mapping
-        indexof = [i for i, s in enumerate(cls.key_mapping) if vk in s]
-        if indexof != []:
-            del cls.key_mapping[indexof[0]]
+    def unregister(cls, vk, mod_key=None):  # mod_key is now optional
+        cls.key_mapping = [(vk_item, keyname_item, mod_item, func_item, index_item) for
+                           vk_item, keyname_item, mod_item, func_item, index_item
+                           in cls.key_mapping if vk_item != vk or (mod_key is not None and mod_key != mod_item)]
+        for _, (vk_item, keyname, modifiers, func, index) in enumerate(cls.key_mapping):
+            cls.user32.UnregisterHotKey(None, index)
+
+    @classmethod
+    def start_listen_thread(cls):
+        cls.listen_thread = threading.Thread(target=cls.listen)
+        cls.listen_thread.start()
 
     @classmethod
     def listen(cls):
-        """
-        Start the message pump
-        """
-
-        for index, (vk, keyname, modifiers, func) in enumerate(cls.key_mapping):
+        cls.listenning = True
+        print(f"start listenning {cls.key_mapping}")
+        for _, (vk, keyname, modifiers, func, index) in enumerate(cls.key_mapping):
             if not cls.user32.RegisterHotKey(None, index, modifiers, vk):
-                # raise Exception('Unable to register hot key: ' + str(vk))
                 input("Can't assign {} as hotkey. Press Enter to continue...".format(keyname[3:]))
-                for index, (vk, keyname, modifiers, func) in enumerate(cls.key_mapping):
-                    cls.user32.UnregisterHotKey(None, index)
+                cls.stop()
                 return
 
-        try:
-            msg = wintypes_MSG()
-            while cls.user32.GetMessageA(ctypes_byref(msg), None, 0, 0) != 0:
-                if msg.message == win32con.WM_HOTKEY:
-                    (vk, keyname, modifiers, func) = cls.key_mapping[msg.wParam]
-                    if not func:
-                        break
-                    func()
+        msg = MSG()
+        while cls.user32.GetMessageA(byref(msg), None, 0, 0) != 0:
+            if msg.message == win32con.WM_HOTKEY:
+                for _, (vk, keyname, modifiers, func, index) in enumerate(cls.key_mapping):
+                    if msg.wParam == index:
+                        if func:
+                            func()
 
-                cls.user32.TranslateMessage(ctypes_byref(msg))
-                cls.user32.DispatchMessageA(ctypes_byref(msg))
+            cls.user32.TranslateMessage(byref(msg))
+            cls.user32.DispatchMessageA(byref(msg))
+            if not cls.listenning:
+                break
 
-        finally:
-            for index, (vk, keyname, modifiers, func) in enumerate(cls.key_mapping):
-                cls.user32.UnregisterHotKey(None, index)
+    @classmethod
+    def wait(cls):
+        cls.listen_thread.join()
+
+    @classmethod
+    def stop(cls):
+        print(f"cls.listenning: {cls.listen_thread.ident}")
+        print(f"stop listenning {cls.key_mapping}")
+        for i, (vk, keyname, modifiers, func, index) in enumerate(cls.key_mapping):
+            print(f"unregister {vk} {keyname} {modifiers} {index}")
+            cls.user32.UnregisterHotKey(None, index)
+        del cls.key_mapping[:]
+        cls.listenning = False
+
+        cls.user32.PostThreadMessageA(cls.listen_thread.ident, win32con.WM_QUIT, 0, 0)
 
     @classmethod
     def _include_defined_vks(cls):

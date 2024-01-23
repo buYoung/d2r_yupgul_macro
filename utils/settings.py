@@ -23,7 +23,17 @@ class Settings:
             'images/perfect_topaz.png',
             'images/perfect_skull.png',
         ]
+        self.gem_find_type = ''
         self.window_title = 'Diablo II: Resurrected'
+        self.hot_key_gem_craft = ['Shift', 'W']
+
+    def change_gem_find_type(self, gem_find_type):
+        self.gem_find_type = gem_find_type
+        self.save_to_toml()
+
+    def change_gem_craft_hotkey(self, hot_key):
+        self.hot_key_gem_craft = hot_key
+        self.save_to_toml()
 
     def save_to_toml(self):
         data = {
@@ -39,23 +49,28 @@ class Settings:
                 'data': self.gem_perfect_filenames,
                 'description': '보석인식시 사용할 최상급 보석 이미지 파일명'
             },
+            'gem_find_type': {
+                'data': self.gem_find_type,
+                'description': '보석인식시 사용할 보석 종류'
+            },
             'window_title': {
                 'data': self.window_title,
                 'description': '게임 창 제목'
             },
-            'craft_button': {
-                'data': self.craft_button,
-                'description': '변환 버튼의 위치'
+            'hot_key_gem_craft': {
+                'data': self.hot_key_gem_craft,
+                'description': '보석함 조합 단축키'
             },
         }
-        with open('data.toml', 'w') as file:
+        with open('settings.toml', 'w') as file:
             toml.dump(data, file)
 
     def load_from_toml(self):
-        with open('data.toml', 'r') as file:
+        with open('settings.toml', 'r') as file:
             data = toml.load(file)
         self.gem_min_distance = data['gem_min_distance']['data']
         self.gem_flawless_filenames = data['gem_flawless_filenames']['data']
         self.gem_perfect_filenames = data['gem_perfect_filenames']['data']
+        self.gem_find_type = data['gem_find_type']['data']
         self.window_title = data['window_title']['data']
-        self.craft_button = data['craft_button']['data']
+        self.hot_key_gem_craft = data['hot_key_gem_craft']['data']

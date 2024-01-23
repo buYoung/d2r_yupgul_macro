@@ -29,21 +29,41 @@ const MenuProps = {
 const names = ["상급 보석", "최상급 보석"];
 
 export default function GemCraft() {
-    const [personName, setPersonName] = useState<string[]>([]);
+    const [gemName, setGemName] = useState<string[]>([]);
 
     const inputBoxRef = useRef<TextFieldProps>(null);
 
+    const [defaultGems, defaultHotKey] = gemCraftStore((state) => [state.defaultGems, state.defaultHotKey]);
     const [setGems, setHotKey, save] = gemCraftStore((state) => [state.setGems, state.setHotKey, state.save]);
 
     useEffect(() => {
-        setGems(personName as any);
-    }, [personName]);
+        if (defaultGems.length === 0) return;
+        if (defaultGems.length === 1) {
+            let gemName = "";
+            if (defaultGems[0] === "flawless") gemName = "상급 보석";
+            else if (defaultGems[0] === "perfect") gemName = "최상급 보석";
+            setGemName([gemName]);
+        }
+        if (defaultGems.length === 2) {
+            setGemName(["상급 보석", "최상급 보석"]);
+        }
+    }, [defaultGems]);
 
-    const handleChange = (event: SelectChangeEvent<typeof personName>) => {
+    useEffect(() => {
+        const hotkeyElement = inputBoxRef.current;
+        if (!hotkeyElement) return;
+        hotkeyElement.value = defaultHotKey;
+    }, [defaultHotKey]);
+
+    useEffect(() => {
+        setGems(gemName as any);
+    }, [gemName]);
+
+    const handleChange = (event: SelectChangeEvent<typeof gemName>) => {
         const {
             target: { value }
         } = event;
-        setPersonName(
+        setGemName(
             // On autofill we get a stringified value.
             typeof value === "string" ? value.split(",") : value
         );
@@ -76,7 +96,7 @@ export default function GemCraft() {
     }, []);
 
     return (
-        <Card sx={{ minWidth: 250 }}>
+        <Card sx={{ minWidth: 250, boxShadow: 5 }}>
             <CardContent>
                 <Typography
                     variant="h5"
@@ -96,7 +116,7 @@ export default function GemCraft() {
                         id="demo-multiple-chip"
                         multiple
                         fullWidth
-                        value={personName}
+                        value={gemName}
                         onChange={handleChange}
                         renderValue={(selected) => (
                             <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
@@ -119,7 +139,7 @@ export default function GemCraft() {
                         ml: 1
                     }}>
                     <Typography variant="body2">단축키 설정:</Typography>
-                    <TextField inputRef={inputBoxRef} defaultValue={1} fullWidth onKeyDown={handleHotkeyKeyDown} />
+                    <TextField inputRef={inputBoxRef} fullWidth onKeyDown={handleHotkeyKeyDown} />
                 </Box>
             </CardContent>
             <CardActions>

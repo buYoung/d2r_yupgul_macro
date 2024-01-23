@@ -11,11 +11,24 @@ def is_close(pt, points, min_dist):
 
 class GemFinder:
     def __init__(self, min_distance, flawless_gem_filenames, perfect_gem_filenames):
-
         self.min_distance = min_distance
         self.found_gems = []
         self.flawless_gem_filenames = flawless_gem_filenames
         self.perfect_gem_filenames = perfect_gem_filenames
+        self._allowed_gem_find_types = ['flawless', 'perfect', 'both']
+
+    def inside_change_gem_find_type(self, gem_find_type):
+        if gem_find_type not in self._allowed_gem_find_types:
+            return
+
+        self.found_gems.clear()
+        if gem_find_type == 'flawless':
+            self.add_flawless_gems()
+        elif gem_find_type == 'perfect':
+            self.add_perfect_gems()
+        elif gem_find_type == 'both':
+            self.add_flawless_gems()
+            self.add_perfect_gems()
 
     def add_flawless_gems(self):
         for image_path in self.flawless_gem_filenames:
