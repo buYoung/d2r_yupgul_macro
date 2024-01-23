@@ -44,7 +44,6 @@ class GlobalHotKeys(object):
     @classmethod
     def listen(cls):
         cls.listenning = True
-        print(f"start listenning {cls.key_mapping}")
         for _, (vk, keyname, modifiers, func, index) in enumerate(cls.key_mapping):
             if not cls.user32.RegisterHotKey(None, index, modifiers, vk):
                 input("Can't assign {} as hotkey. Press Enter to continue...".format(keyname[3:]))
@@ -70,10 +69,7 @@ class GlobalHotKeys(object):
 
     @classmethod
     def stop(cls):
-        print(f"cls.listenning: {cls.listen_thread.ident}")
-        print(f"stop listenning {cls.key_mapping}")
         for i, (vk, keyname, modifiers, func, index) in enumerate(cls.key_mapping):
-            print(f"unregister {vk} {keyname} {modifiers} {index}")
             cls.user32.UnregisterHotKey(None, index)
         del cls.key_mapping[:]
         cls.listenning = False
