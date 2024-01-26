@@ -2,6 +2,7 @@ import { Box, Grid, Typography } from "@mui/material";
 import GemCraft from "@components/GemCraft";
 import { useCallback, useEffect, useState } from "react";
 import { gemCraftStore } from "@components/GemCraft.store.ts";
+import Features from "@components/Features.tsx";
 
 function App() {
     const [isReady, setIsReady] = useState(false);
@@ -71,10 +72,10 @@ function App() {
                                 <GemCraft />
                             </Grid>
                             <Grid item xs={12} sm={6} md={4} lg={4} xl={4}>
-                                <GemCraft />
+                                <Features />
                             </Grid>
                             <Grid item xs={12} sm={6} md={4} lg={4} xl={4}>
-                                <GemCraft />
+                                <Features />
                             </Grid>
                         </Grid>
                     </Box>
