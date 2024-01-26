@@ -1,3 +1,7 @@
+import os
+import sys
+
+import pyautogui
 import webview
 import win32con
 
@@ -5,11 +9,12 @@ from utils.global_hotkeys import GlobalHotKeys
 
 
 class WebGuiApi:
-    def __init__(self, settings, gem_finder, find_and_craft_gems, exit_thread):
+    def __init__(self, settings, gem_finder, find_and_craft_gems, exit_thread, global_hot_keys):
         self.find_and_craft_gems = find_and_craft_gems
         self.gem_finder = gem_finder
         self.settings = settings
         self.exit_thread = exit_thread
+        self.global_hot_keys = global_hot_keys
         self.hot_keys = {
             'gem_craft': settings.hot_key_gem_craft,
             # 'jewel_reroll': settings.hot_key_jewel_reroll,
@@ -64,12 +69,25 @@ class WebGuiApi:
 
 class WebGui:
     def __init__(self, web_gui_api):
+        url = 'ui/dist/index.html'
+        if getattr(sys, 'frozen', False):
+            url = os.path.dirname(os.path.abspath(__file__)) + '/ui/dist/index.html'
+
+        pyautogui.alert(url)
         self.window = webview.create_window(
-            'D2 macro', 'ui/dist/index.html', width=800, height=600, js_api=web_gui_api
+            'D2 macro', url, width=800, height=600, js_api=web_gui_api
         )
+        self.window.events.closing += self.on_closing
+        self.window.events.closed += self.on_closed
 
     def serve(self):
         webview.start(debug=False)
 
     def close(self):
         self.window.destroy()
+
+    def on_closing(self):
+        GlobalHotKeys.stop()
+
+    def on_closed(self):
+        exit(0)

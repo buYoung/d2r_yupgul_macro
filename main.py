@@ -93,7 +93,11 @@ if __name__ == '__main__':
     GlobalHotKeys.start_listen_thread()
 
     web_gui_api = WebGuiApi(
-        settings=settings, gem_finder=gem_finder, find_and_craft_gems=find_and_craft_gems, exit_thread=exit_thread
+        settings=settings,
+        gem_finder=gem_finder,
+        find_and_craft_gems=find_and_craft_gems,
+        exit_thread=exit_thread,
+        global_hot_keys=GlobalHotKeys
     )
     gui = WebGui(web_gui_api)
     gui.serve()
