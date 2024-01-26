@@ -58,6 +58,7 @@ class WebGuiApi:
         exit_hotkey = getattr(GlobalHotKeys, f"{exit_key_name}")
         GlobalHotKeys.register(exit_hotkey, exit_key_name, GlobalHotKeys.MOD_SHIFT, self.exit_thread)
         GlobalHotKeys.start_listen_thread()
+        self.settings.change_gem_craft_hotkey([mod_key, hot_key])
         print("change hotkey to type: {} {} + {}".format(type, mod_key, hot_key))
 
 
@@ -68,7 +69,7 @@ class WebGui:
         )
 
     def serve(self):
-        webview.start(debug=True)
+        webview.start(debug=False)
 
     def close(self):
         self.window.destroy()

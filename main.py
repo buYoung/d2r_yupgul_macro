@@ -26,15 +26,6 @@ def diablo2_window_size():
             diablo2_window.width, diablo2_window.height)
 
 
-def capture_gems():
-    screen_shot = ImageGrab.grab(bbox=(left, top, left + width, top + height))
-    screen_shot.save('screenshot.png')
-
-    gem_locations = gem_finder.find_gems(screen_shot)
-
-    return gem_locations
-
-
 def get_craft_button_location():
     _craft_button_x, _craft_button_y = _poly_model.predict(np.array([[width, height]]))[0]
     return int(_craft_button_x + left), int(_craft_button_y + top)
@@ -43,10 +34,12 @@ def get_craft_button_location():
 def find_and_craft_gems():
     print('find_and_craft_gems')
     if len(gem_finder.found_gems) == 0:
-        webview.windows[0].evaluate_js('alert("보석이 등록되지 않았습니다.")')
+        pyautogui.alert('보석인식시 사용할 보석 종류를 선택해주세요.')
         return
 
-    locations = capture_gems()
+    screen_shot = ImageGrab.grab(bbox=(left, top, left + width, top + height))
+    screen_shot.save('screenshot.png')
+    locations = gem_finder.find_gems(screen_shot)
 
     for location in locations:
         pyautogui.keyDown('ctrl')

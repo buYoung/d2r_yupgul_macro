@@ -62,11 +62,11 @@ class Settings:
                 'description': '보석함 조합 단축키'
             },
         }
-        with open('settings.toml', 'w') as file:
+        with open('settings.toml', 'w', encoding='utf-8') as file:
             toml.dump(data, file)
 
     def load_from_toml(self):
-        with open('settings.toml', 'r') as file:
+        with open('settings.toml', 'r', encoding='utf-8') as file:
             data = toml.load(file)
         self.gem_min_distance = data['gem_min_distance']['data']
         self.gem_flawless_filenames = data['gem_flawless_filenames']['data']
