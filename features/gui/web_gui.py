@@ -71,9 +71,8 @@ class WebGui:
     def __init__(self, web_gui_api):
         url = 'ui/dist/index.html'
         if getattr(sys, 'frozen', False):
-            url = os.path.dirname(os.path.abspath(__file__)) + '/ui/dist/index.html'
+            url = os.path.dirname(sys.executable) + '/ui/dist/index.html'
 
-        pyautogui.alert(url)
         self.window = webview.create_window(
             'D2 macro', url, width=800, height=600, js_api=web_gui_api
         )
